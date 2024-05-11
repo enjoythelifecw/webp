@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+    <!-- <script src="js/vex.combined.min.js"></script>
+    <script>vex.defaultOptions.className = 'vex-theme-flat-attack'</script>
+    <link rel="stylesheet" href="css/vex.css" />
+    <link rel="stylesheet" href="css/vex-theme-flat-attack.css" />
+     -->
+    <title>책 추가</title>
+
+
+
+    
+    <script>
+        window.onload = () => {
+            document.getElementById("책추가").onclick = () => {
+                console.log("책추가 클릭")
+                let 분류 = document.getElementById("분류").value;
+                let 책이미지 = document.getElementById("책이미지").value;
+                let 제목 = document.getElementById("제목").value;
+                let 저자 = document.getElementById("저자").value;
+                let 출판사 = document.getElementById("출판사").value;
+                let 발행일 = document.getElementById("발행일").value;
+                let 독서기록 = document.getElementById("독서기록").value;
+                let 평점 = document.getElementById("평점").value;
+                
+                axios
+                    .post("/book", {
+                        분류: 분류,
+                        책이미지: 책이미지,
+                        제목: 제목,
+                        저자: 저자,
+                        출판사: 출판사,
+                        발행일: 발행일,
+                        독서기록: 독서기록,
+                        평점: 평점
+                    })
+                    .then((response) => {
+                        // vex.dialog.alert("업데이트 완료");
+                        console.log("성공");
+
+                    })
+                    .catch((error) => {
+                        // vex.dialog.alert("값을 제대로 입력하셔야 합니다!");
+                        console.log(error);
+                    });
+            };
+        }
+    </script>
+
+
+
+</head>
+<body>
+    <h1>책 추가</h1>
+    <label for="분류">분류:</label><br>
+    <select id="분류" name="분류" required>
+        <option value="" disabled selected>분류를 선택하세요</option>
+        <option value="소설">소설</option>
+        <option value="자기계발">자기계발</option>
+        <option value="역사">역사</option>
+        <!-- 필요한 만큼 옵션 추가 -->
+    </select><br>
+    <label for="책이미지">책 이미지 URL:</label><br>
+    <input type="url" id="책이미지" name="책이미지" required><br>
+    <label for="제목">제목:</label><br>
+    <input type="text" id="제목" name="제목" required><br>
+    <label for="저자">저자:</label><br>
+    <input type="text" id="저자" name="저자" required><br>
+    <label for="출판사">출판사:</label><br>
+    <input type="text" id="출판사" name="출판사" required><br>
+    <label for="발행일">발행일:</label><br>
+    <input type="date" id="발행일" name="발행일" required><br>
+    <label for="독서기록">독서 기록:</label><br>
+    <textarea id="독서기록" name="독서기록" rows="4" cols="50" required></textarea><br>
+    <label for="평점">평점:</label><br>
+    <input type="number" id="평점" name="평점" min="0" max="5" step="0.1" required><br><br>
+    <button type="button" id="책추가">책 추가</button>
+    <br>
+    <form action="/" method="GET"> <!-- 홈 화면으로 이동하는 버튼 추가 -->
+        <button type="submit">홈 화면으로 이동</button>
+    </form>
+</body>
+</html>
