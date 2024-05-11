@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/book_list.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>도서 목록 및 독서기록 보기</title>
+</head>
+<body>
+
+<div id="filteredDataContainer">
+    <!-- 여기에 필터링된 도서 목록이 나타날 것입니다. -->
+</div>
+
+<script>
+    const serverUrl = 'http://localhost:5502';
+    function readCsvAndFilterByUserID() {
+        // CSV 파일을 읽어오는 로직 추가
+
+        // 예시로 받은 데이터
+        axios.get(serverUrl +'/book_userID_filtered')
+            .then(response => {
+            let filteredData = response.data;
+            console.log(filteredData)
+        
+        
+            // 필터링된 데이터를 사용하여 HTML 생성
+            let html = '<table>';
+            html += '<tr><th>제목</th><th>날짜</th><th>독서기록 보기</th></tr>';
+            filteredData.forEach(item => {
+                console.log(item)
+
+                html += `<tr><td>${item.제목}</td><td>${item.날짜}</td><td><button onclick="openReadingRecord('${item.독서기록}')">독서기록보기</button></td></tr>`;
+
+            });
+            html += '</table>';
+
+            console.log(html)
+            
+            // HTML을 삽입할 요소 선택
+            const container = document.getElementById('filteredDataContainer');
+            if (container) {
+                container.innerHTML = html;
+            }
+            
+        })
+
+
+    }
+
+    // 독서기록 보기 창 열기
+    function openReadingRecord(독서기록) {
+        // 독서기록을 볼 수 있는 창을 여는 로직 추가
+        alert(`${독서기록}`);
+    }
+
+    // 예시로 userID가 100인 데이터 필터링하여 리스트 생성
+    readCsvAndFilterByUserID();
+</script>
+
+</body>
+</html>

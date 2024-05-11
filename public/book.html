@@ -3,88 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
-
-    <!-- <script src="js/vex.combined.min.js"></script>
-    <script>vex.defaultOptions.className = 'vex-theme-flat-attack'</script>
-    <link rel="stylesheet" href="css/vex.css" />
-    <link rel="stylesheet" href="css/vex-theme-flat-attack.css" />
-     -->
-    <title>책 추가</title>
-
-
-
-    
-    <script>
-        window.onload = () => {
-            document.getElementById("책추가").onclick = () => {
-                console.log("책추가 클릭")
-                let 분류 = document.getElementById("분류").value;
-                let 책이미지 = document.getElementById("책이미지").value;
-                let 제목 = document.getElementById("제목").value;
-                let 저자 = document.getElementById("저자").value;
-                let 출판사 = document.getElementById("출판사").value;
-                let 발행일 = document.getElementById("발행일").value;
-                let 독서기록 = document.getElementById("독서기록").value;
-                let 평점 = document.getElementById("평점").value;
-                
-                axios
-                    .post("/book", {
-                        분류: 분류,
-                        책이미지: 책이미지,
-                        제목: 제목,
-                        저자: 저자,
-                        출판사: 출판사,
-                        발행일: 발행일,
-                        독서기록: 독서기록,
-                        평점: 평점
-                    })
-                    .then((response) => {
-                        // vex.dialog.alert("업데이트 완료");
-                        console.log("성공");
-
-                    })
-                    .catch((error) => {
-                        // vex.dialog.alert("값을 제대로 입력하셔야 합니다!");
-                        console.log(error);
-                    });
-            };
+    <title>책 추천 및 독서 기록 플랫폼</title>
+    <style>
+        /* CSS 스타일링 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
         }
-    </script>
-
-
-
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .book-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        .book-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .book-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .book-item button:hover {
+            background-color: #c82333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        form input[type="text"], form button[type="submit"], form textarea, form input[type="date"], form select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: calc(100% - 20px);
+            display: block; /* 입력 요소들을 블록으로 표시 */
+        }
+        form button[type="submit"] {
+            width: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>책 추가</h1>
-    <label for="분류">분류:</label><br>
-    <select id="분류" name="분류" required>
-        <option value="" disabled selected>분류를 선택하세요</option>
-        <option value="소설">소설</option>
-        <option value="자기계발">자기계발</option>
-        <option value="역사">역사</option>
-        <!-- 필요한 만큼 옵션 추가 -->
-    </select><br>
-    <label for="책이미지">책 이미지 URL:</label><br>
-    <input type="url" id="책이미지" name="책이미지" required><br>
-    <label for="제목">제목:</label><br>
-    <input type="text" id="제목" name="제목" required><br>
-    <label for="저자">저자:</label><br>
-    <input type="text" id="저자" name="저자" required><br>
-    <label for="출판사">출판사:</label><br>
-    <input type="text" id="출판사" name="출판사" required><br>
-    <label for="발행일">발행일:</label><br>
-    <input type="date" id="발행일" name="발행일" required><br>
-    <label for="독서기록">독서 기록:</label><br>
-    <textarea id="독서기록" name="독서기록" rows="4" cols="50" required></textarea><br>
-    <label for="평점">평점:</label><br>
-    <input type="number" id="평점" name="평점" min="0" max="5" step="0.1" required><br><br>
-    <button type="button" id="책추가">책 추가</button>
-    <br>
-    <form action="/" method="GET"> <!-- 홈 화면으로 이동하는 버튼 추가 -->
-        <button type="submit">홈 화면으로 이동</button>
-    </form>
+    <div class="container">
+        <h1>책 추천 및 독서 기록 플랫폼</h1>
+
+        <!-- 책 추가 폼 -->
+        <form id="addBookForm">
+            <label for="title">책 제목:</label>
+            <input type="text" id="title" name="title" placeholder="책 제목" required>
+            <label for="author">저자:</label>
+            <input type="text" id="author" name="author" placeholder="저자" required>
+            <label for="startDate">읽기 시작한 날짜:</label>
+            <input type="date" id="startDate" name="startDate" required>
+            <label for="category">분류:</label>
+            <select id="category" name="category">
+                <option value="" selected disabled>분류 선택</option>
+                <option value="소설">소설</option>
+                <option value="에세이">에세이</option>
+                <option value="자기계발">자기계발</option>
+                <option value="역사">역사</option>
+                <option value="시">시</option>
+                <option value="예술">예술</option>
+            </select>
+            <label for="readingRecord">독서 기록:</label>
+            <textarea id="readingRecord" name="readingRecord" placeholder="독서 기록 입력"></textarea>
+            <button type="submit">책 추가</button>
+
+        </form>
+
+        <button id="viewReadingRecordsBtn">독서 기록 보기</button>
+
+
+        
+    </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- AJAX 요청을 처리할 자바스크립트 -->
+    <script>
+        // 문서가 준비되면 실행
+        $(document).ready(function(){
+            // 서버 주소와 포트
+            const serverUrl = 'http://localhost:5502';
+            // 책 추가 폼 제출 이벤트 처리
+            $('#addBookForm').submit(function(event){
+                // 폼 기본 동작 막기
+                event.preventDefault();
+                // 입력된 데이터 가져오기
+                var title = $('#title').val();
+                var author = $('#author').val();
+                var startDate = $('#startDate').val();
+                var category = $('#category').val();
+                var readingRecord = $('#readingRecord').val();
+                // AJAX를 통한 책 추가 요청
+                $.ajax({
+                    url: serverUrl + '/books',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({title: title, author: author, startDate: startDate, category: category, readingRecord: readingRecord}),
+                })
+                .then(response => {
+                    console.log(response.success)
+                    console.log(response.comment)
+
+                if (!response.success) {
+                    alert(response.comment);
+                } else {
+                    alert(response.comment);
+
+                }
+            })
+        
+
+            });
+
+            $('#viewReadingRecordsBtn').click(function() {
+
+                window.location.href = serverUrl + '/book_list.html';
+            });
+
+        });
+
+
+        
+        </script>
 </body>
 </html>
