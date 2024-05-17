@@ -3,15 +3,23 @@ const fs = require('fs');
 const csv = require('csv-parser'); 
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+// const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+
+const multer = require('multer');
+const path = require('path'); // path 모듈 추가
 
 
+require('dotenv').config(); // dotenv를 사용하여 .env 파일의 내용을 로드
 
 const app = express();
-const port = 5502;
+const port = process.env.PORT;
+
+const serverUrl = process.env.serverURL;
 
 
 
+
+////////////////////////////////////
 let userCount = 0;
 
 const userCsvFilePath = 'users.csv';
@@ -61,6 +69,28 @@ fs.access(bookCsvFilePath, fs.constants.F_OK, (err) => {
         });
     }
 });
+//////////////////
+
+
+
+// 업로드 폴더가 존재하지 않으면 생성
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// 업로드 설정
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir); // 'uploads/' 대신 uploadDir 사용
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
 
 
 
@@ -101,7 +131,7 @@ app.post('/login', (req, res) => {
             // 데이터 처리가 완료된 후에 사용자가 발견되었는지 확인
             if (userFound) {
                 // 로그인 성공 시 book 페이지로 리다이렉트
-                res.redirect('/book');
+                res.redirect('/book.html');
             } else {
                 // 사용자가 발견되지 않으면 해당하는 메시지를 보내기
                 res.send('사용자 정보가 일치하지 않습니다.');
@@ -158,18 +188,17 @@ app.get('/books', (req, res) => {
     res.sendFile(__dirname + '/public/book.html');
 });
 
-// 책 추가
-app.post('/books', (req, res) => {
+app.post('/books', upload.single('image'), (req, res) => {
     const { title, author, startDate, category, readingRecord } = req.body;
-    const bookData = `${login_userid},${title},${author},${startDate},${category},${readingRecord}\n`;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : '';
+    const bookData = `${login_userid},${title},${author},${startDate},${category},${readingRecord},${imagePath}\n`;
 
     fs.appendFile(bookCsvFilePath, bookData, { encoding: 'utf-8' }, (err) => {
         if (err) {
-            res.json({success: false, comment:err})
+            res.json({success: false, comment: err});
             return;
         }
-        res.json({success: true, comment:"성공적으로 추가되었습니다"})
-        // res.sendFile(__dirname + '/public/html/book.html');
+        res.json({success: true, comment: "성공적으로 추가되었습니다"});
     });
 });
 
